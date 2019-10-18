@@ -1,6 +1,6 @@
 # Freeplane-save-pasted-images
 
-A groovy script for Freeplane to save images when pasting from web or text/html mime type with file URI
+A Groovy script for Freeplane to save images when pasting from web or text/html mime type with file URI
 
 ## Introduction
 
@@ -21,3 +21,11 @@ You may also need to enable permission to read, write files and run network oper
 
 After pasting like usual, select the parent node if it is changed, and then run the script from Tools/Scripts/Save Pasted Images
 It is best to assign this script to a shortcut
+
+## Limitations
+
+At the moment, the script only works with text/html type, and is not able to process SVG or Base64 images or images embed in rtf mime type (e.g. when copying from Word 2010 in WINE, there is only rtf type in the clipboard). It also doesn't work on notes.
+
+In the near future, I intend to update this script and make an another to process all the images in attached notes. If you have any ideas or issues, please pm me or make a ticket on github.
+
+I have yet tested the script on Windows or MacOS.
