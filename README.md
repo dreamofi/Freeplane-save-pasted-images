@@ -19,7 +19,7 @@ You may also need to enable permission to read, write files and run network oper
 
 ## How to use
 
-After pasting like usual, select the parent node if it is changed, and then run the script from Tools/Scripts/Save Pasted Images
+Just run the script fromm Tools/Scripts/Save Pasted Images, it will paste the data and download/copy the images automatically
 It is best to assign this script to a shortcut
 
 ## Limitations
