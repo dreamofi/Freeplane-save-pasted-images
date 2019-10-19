@@ -1,3 +1,4 @@
+@Grab('org.jsoup:jsoup:1.12.1')
 import java.nio.file.*
 import java.text.SimpleDateFormat
 import org.freeplane.features.map.mindmapmode.clipboard.MMapClipboardController
