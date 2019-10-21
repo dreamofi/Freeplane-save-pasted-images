@@ -13,16 +13,18 @@ import java.io.IOException;
 //TODO: Add ability to process Base64 image
 
 //Get selected nodes:
-def selectedNodes = c.selecteds
+selectedNodes = c.selecteds
 
 //Get list of node containing image links
 c.statusInfo = "Processing"
-def listNodeWithImg = []
-def listNodeWithNotesWithImg = []
+listNodeWithImg = []
+listNodeWithNotesWithImg = []
+listNodeWithDetailsWithImg = []
 
 selectedNodes.each{ eachNode -> 
    listNodeWithImg += eachNode.find{htmlUtils.isHtmlNode(it.text) && it.text.contains("<img")}
    listNodeWithNotesWithImg += eachNode.find{(it.noteText != null) && it.noteText.contains("<img")}
+   listNodeWithDetailsWithImg += eachNode.find{(it.detailsText != null) && it.detailsText.contains("<img")}
 }
 
 //Get list of node with notes containing image links
@@ -128,15 +130,21 @@ def getDateTimeNow () {
 
 /* Parse the text of nodes containing imgs to extract src */
 
-def checkNote(nodeTest, Boolean withNote) {
-    if (withNote == false) {
-        return nodeTest.text    
-    } else {
-        return nodeTest.noteText
+def checkNote(nodeTest, int cases) {
+    switch(cases){
+        case 0:
+            return nodeTest.text    
+            break
+        case 1:
+            return nodeTest.noteText    
+            break
+        case 2:
+            return nodeTest.detailsText    
+            break
     }
 }
 
-def downloadImages (nodes, Boolean withNote) {
+def downloadImages (nodes, int cases) {
     if (nodes.isEmpty()) {
         c.statusInfo = "Nothing to download"    
     } else {
@@ -154,7 +162,7 @@ def downloadImages (nodes, Boolean withNote) {
         
         nodes.each{eachNode -> 
             
-            Document parseString = Jsoup.parse(checkNote(eachNode, withNote));    
+            Document parseString = Jsoup.parse(checkNote(eachNode, cases));    
             
             Elements imgTags = parseString.getElementsByTag('img');
 
@@ -166,28 +174,40 @@ def downloadImages (nodes, Boolean withNote) {
 
                 //Copy image from tmp to mm folder if it is on local machine
             if (imgSrc.contains("file:////") || imgSrc.contains("file:///")) {
-                    def file2Copy = convertFileUri(imgSrc)
-                    def srcPath = Paths.get(file2Copy)
+                def file2Copy = convertFileUri(imgSrc)
+                def srcPath = Paths.get(file2Copy)
 
-                    def baseName = ""
-                    if (withNote == false) {
+                baseName = ""
+                switch(cases){
+                    case 0:
                         baseName = "${eachNode.id}_${index}_${getDateTimeNow()}" + srcPath.getFileName()
-                    } else {
+                        break
+                    case 1:
                         baseName = "Note_${eachNode.id}_${index}_${getDateTimeNow()}" + srcPath.getFileName()
-                    }
+                        break
+                    case 2:
+                        baseName = "Details_${eachNode.id}_${index}_${getDateTimeNow()}" + srcPath.getFileName()
+                        break
+                }
 
-                    def desPath = Paths.get(fileAbsPath.toString(), baseName)
-                    if (Files.exists(srcPath)){
-                        Files.copy(srcPath, desPath) 
-                        if (withNote == false) {
+                def desPath = Paths.get(fileAbsPath.toString(), baseName)
+                if (Files.exists(srcPath)){
+                    Files.copy(srcPath, desPath) 
+                    switch(cases){
+                        case 0:
                             eachNode.text = eachNode.text.replace(imgSrc, Paths.get(imgRelPath, baseName).toString())            
                             eachNode.link.text = Paths.get(imgRelPath, baseName).toString()
-                        } else {
+                            break
+                        case 1:
                             eachNode.noteText = eachNode.noteText.replace(imgSrc, Paths.get(imgRelPath, baseName).toString())            
-                        }
-                        index += 1
+                            break
+                        case 2:
+                            eachNode.detailsText = eachNode.detailsText.replace(imgSrc, Paths.get(imgRelPath, baseName).toString())            
+                            break
                     }
-                }       
+                    index += 1
+                }
+            }       
                                
                 //Download image if it is on the internet
                 def fileExt = isDownloadable(imgSrc)                
@@ -195,10 +215,16 @@ def downloadImages (nodes, Boolean withNote) {
                     def dateNow = getDateTimeNow() 
 
                     String fileSaveName = ""
-                    if (withNote == false){
-                        fileSaveName = "${eachNode.id}_${index}_${dateNow}.${fileExt}"
-                    } else {
-                        fileSaveName = "Note_${eachNode.id}_${index}_${dateNow}.${fileExt}"
+                    switch(cases){
+                        case 0:
+                            fileSaveName = "${eachNode.id}_${index}_${dateNow}.${fileExt}"
+                            break
+                        case 1:
+                            fileSaveName = "Note_${eachNode.id}_${index}_${dateNow}.${fileExt}"
+                            break
+                        case 2:
+                            fileSaveName = "Details_${eachNode.id}_${index}_${dateNow}.${fileExt}"
+                            break
                     }
 
                     def replaceNodePath = Paths.get(imgRelPath, fileSaveName).toString()
@@ -208,21 +234,26 @@ def downloadImages (nodes, Boolean withNote) {
                     downloadFile(imgSrc, fileDownloadPath)
 
                     //Set the node src
-                    if (withNote == false){
-                        eachNode.text = eachNode.text.replace(imgSrc, replaceNodePath)            
-                    } else {
-                        eachNode.noteText = eachNode.noteText.replace(imgSrc, replaceNodePath)            
+                    switch(cases){
+                        case 0:
+                            eachNode.text = eachNode.text.replace(imgSrc, replaceNodePath)            
+                            break
+                        case 1:
+                            eachNode.noteText = eachNode.noteText.replace(imgSrc, replaceNodePath)            
+                            break
+                        case 2:
+                            eachNode.detailsText = eachNode.detailsText.replace(imgSrc, replaceNodePath)            
+                            break
                     }
                     index += 1
                 }
             }
-           
         }
     }
-     
 }
 
-downloadImages(listNodeWithNotesWithImg, true)
-downloadImages(listNodeWithImg, false)
+downloadImages(listNodeWithImg, 0)
+downloadImages(listNodeWithNotesWithImg, 1)
+downloadImages(listNodeWithDetailsWithImg, 2)
 
 c.statusInfo = "DONE!"
