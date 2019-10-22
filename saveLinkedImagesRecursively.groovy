@@ -43,6 +43,7 @@ public String getContentType(String urlString) throws IOException{
     URL url = new URL(urlString);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setRequestMethod("HEAD");
+    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3835.0 Safari/537.36")
     if (isRedirect(connection.getResponseCode())) {
         String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
         logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
@@ -71,11 +72,21 @@ protected Boolean isRedirect(int statusCode) {
 
 def isDownloadable (String link) {
     def imgType = ['image/png','image/jpg','image/jpeg','image/png','image/tiff','image/bmp', 'image/tiff-fx', 'image/gif']
+    imgExt = ['.png', '.jpg','.jpeg','.tiff', '.bmp', '.gif']
+    containExt = ""
+    imgExt.each{ ext ->
+        if(link.contains(ext)){
+            containExt = ext - "."
+        }
+    }
     try {
         def contentType = getContentType(link)
         if (imgType.contains(contentType)){
             return (contentType - 'image/')
-        } else {
+        } else if (containExt != "") {
+            return containExt            
+        }        
+        else {
             return "nope"    
         }
     } catch (Exception e) {
@@ -88,6 +99,7 @@ def redirectFollowingDownload( String url, String filename ) {
   while( url ) {
     new URL( url ).openConnection().with { conn ->
       conn.instanceFollowRedirects = false
+      conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3835.0 Safari/537.36")
       url = conn.getHeaderField( "Location" )      
       if( !url ) {
         new File( filename ).withOutputStream { out ->
