@@ -16,13 +16,13 @@ These scripts will deal with images linked to external sources, allowing you to 
 
 The scripts were tested in Freeplane 1.7.9, on a PC running MX Linux 18.3 (based on Debian 9 Stretch)
 
-NOTE: On Windows, if you see Error executing the script: org/apache/ivy/plugins/resolver/DependencyResolver, please use the scripts in the ScriptsWithoutGrab folder of this github, and if they still don't work, try updating your Freeplane and JRE to the latest version.
+NOTE: On Windows, if you see Error executing the script: org/apache/ivy/plugins/resolver/DependencyResolver, please try updating your Freeplane and JRE to the latest version.
 
 ## Installation
 
 You just need to copy all the scripts to Freeplane user scripts folder (on Linux it is ~/.config/freeplane/1.7.x/scripts)
 
-And also download the Jsoup core library from [here](https://jsoup.org/download) (the latest is jsoup-1.12.1.jar) and put it into ~/.config/freeplane/1.7.x/lib
+And also download the Jsoup core library from [here](https://jsoup.org/download) for scripts that need it (the latest is jsoup-1.12.1.jar) and put it into ~/.config/freeplane/1.7.x/lib
 
 You may also need to enable permission to read, write files and run network operation in Tools/Preferences/Plugins/Scripting
 
@@ -33,8 +33,8 @@ It is best to assign scripts to a shortcut
 
 ## Limitations
 
-At the moment, the scripts only works with text/html type, and are not able to process SVG or Base64 images or images embed in rtf mime type (e.g. when copying from Word 2010 in WINE, there is only rtf type in the clipboard).
+At the moment, savePastedImages.groovy and saveLinkedImagesRecursively.groovy scripts only works with text/html type, and are not able to process SVG or Base64 images or images embed in rtf mime type (e.g. when copying from Word 2010 in WINE, there is only rtf type in the clipboard).
 
-I have yet tested the script on Windows or MacOS.
+I have yet tested the scripts on Windows or MacOS.
 
 If you have any ideas or issues, please pm me or make a ticket on github.
