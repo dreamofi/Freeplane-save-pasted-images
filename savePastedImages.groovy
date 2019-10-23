@@ -50,6 +50,7 @@ public String getContentType(String urlString) throws IOException{
     URL url = new URL(urlString);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setRequestMethod("HEAD");
+    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3835.0 Safari/537.36")    
     if (isRedirect(connection.getResponseCode())) {
         String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
         logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
@@ -95,6 +96,7 @@ def redirectFollowingDownload( String url, String filename ) {
   while( url ) {
     new URL( url ).openConnection().with { conn ->
       conn.instanceFollowRedirects = false
+      conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3835.0 Safari/537.36")
       url = conn.getHeaderField( "Location" )      
       if( !url ) {
         new File( filename ).withOutputStream { out ->

@@ -1,4 +1,3 @@
-@Grab('org.jsoup:jsoup:1.12.1')
 import javax.swing.*;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
