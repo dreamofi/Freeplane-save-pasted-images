@@ -69,8 +69,12 @@ protected Boolean isRedirect(int statusCode) {
     return false;
 }
 
+//A function to check if an image link is downloadable
 def isDownloadable (String link) {
+    //list the content type to receive from header
     def imgType = ['image/png','image/jpg','image/jpeg','image/png','image/tiff','image/bmp', 'image/tiff-fx', 'image/gif']
+
+    //additional list of extension to force download when the response return text/html contentype, but the link contains the extension    
     imgExt = ['.png', '.jpg','.jpeg','.tiff', '.bmp', '.gif']
     containExt = ""
     imgExt.each{ ext ->
@@ -94,10 +98,12 @@ def isDownloadable (String link) {
     }
 }
 
+//A function to check if the image link redirects to another link, and download the file following the redirected link
 def redirectFollowingDownload( String url, String filename ) {
   while( url ) {
     new URL( url ).openConnection().with { conn ->
       conn.instanceFollowRedirects = false
+      //Set the User-Agent is required to prevent Status 403 on some sites
       conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3835.0 Safari/537.36")
       url = conn.getHeaderField( "Location" )      
       if( !url ) {
@@ -120,6 +126,7 @@ def downloadFile (String link, String fileSave) {
     }    
 }
 
+//Check if the image link contain file URI, then remove it to get the right path to image
 def convertFileUri (String fileUri) {
    def file2Copy = ""   
    if (fileUri.contains("file:////")){
